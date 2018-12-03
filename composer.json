@@ -1,0 +1,25 @@
+{
+  "name": "cheezykins/advent-of-code",
+  "description": "My answers to the advent of code calendar",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Chris Stretton",
+      "email": "cstretton@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Cheezykins\\AdventOfCode\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Cheezykins\\AdventOfCode\\Test\\": "test/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.4"
+  }
+}
