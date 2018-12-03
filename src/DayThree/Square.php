@@ -9,7 +9,7 @@ class Square
     protected $x;
     protected $y;
 
-    protected $claims = [];
+    protected $claims = 0;
 
     public function __construct(int $x, int $y)
     {
@@ -17,13 +17,13 @@ class Square
         $this->y = $y;
     }
 
-    public function addClaim(Claim $claim): void
+    public function addClaim(): void
     {
-        $this->claims[] = $claim;
+        $this->claims ++;
     }
 
     public function claimCount(): int
     {
-        return count($this->claims);
+        return $this->claims;
     }
 }

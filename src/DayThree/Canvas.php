@@ -22,12 +22,12 @@ class Canvas
             $claim = Claim::parseFromEntry($claimString);
             $this->claims[] = $claim;
             foreach ($claim->getClaimedPoints() as [$x, $y]) {
-                $this->updateSquare($x, $y, $claim);
+                $this->updateSquare($x, $y);
             }
         }
     }
 
-    protected function updateSquare(int $x, int $y, Claim $claim)
+    protected function updateSquare(int $x, int $y)
     {
         if (!array_key_exists($x, $this->squares)) {
             $this->squares[$x] = [];
@@ -35,7 +35,7 @@ class Canvas
         if (!array_key_exists($y, $this->squares[$x])) {
             $this->squares[$x][$y] = new Square($x, $y);
         }
-        $this->squares[$x][$y]->addClaim($claim);
+        $this->squares[$x][$y]->addClaim();
     }
 
     public function calculateOverlappingSquares(): int
@@ -44,7 +44,7 @@ class Canvas
         foreach ($this->squares as $row) {
             foreach ($row as $square) {
                 if ($square->claimCount() > 1) {
-                    $return ++;
+                    $return++;
                 }
             }
         }
