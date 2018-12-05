@@ -23,6 +23,7 @@
     "phpunit/phpunit": "^7.4"
   },
   "require": {
-    "nesbot/carbon": "^2.7"
+    "nesbot/carbon": "^2.7",
+    "ext-ctype": "*"
   }
 }
