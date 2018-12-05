@@ -13,20 +13,17 @@ class PolymerTest extends TestCase
     {
         $p = new Polymer('dabAcCaCBAcCcaDA');
 
-        $p->activate();
+        $size = $p->activate();
 
-        $this->assertEquals('dabCBAcaDA', $p->getActivatedChain());
-
-        $this->assertEquals(10, strlen($p->getActivatedChain()));
+        $this->assertEquals(10, $size);
     }
 
     public function testBestReactant()
     {
         $p = new Polymer('dabAcCaCBAcCcaDA');
 
-        $best = $p->determineBestReactant();
+        $size = $p->optimize();
 
-        $this->assertEquals('c', $best);
-        $this->assertEquals(4, strlen($p->getOptimalChain()));
+        $this->assertEquals(4, $size);
     }
 }

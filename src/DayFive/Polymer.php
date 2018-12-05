@@ -20,81 +20,57 @@ class Polymer
         $this->chain = $chain;
     }
 
-    public function determineBestReactant(): ?string
+    public function optimize(): ?int
     {
-
-        $fullChain = $this->chain;
         $letters = range('a', 'z');
-        $counts = array_fill_keys($letters, null);
-        $strings = array_fill_keys($letters, '');
+        $minimal = null;
 
         foreach ($letters as $letter) {
             if (stripos($this->chain, $letter) === false) {
-                unset($counts[$letter]);
-                unset($strings[$letter]);
                 continue;
             }
-            $this->chain = str_ireplace($letter, '', $this->chain);
-            $this->activate();
-            $length = strlen($this->activated);
-            $counts[$letter] = $length;
-            $strings[$letter] = $this->activated;
-            $this->chain = $fullChain;
+            $chain = self::reduce($this->chain, $letter);
+            if ($minimal === null || strlen($chain) < $minimal) {
+                $minimal = strlen($chain);
+                $this->optimal = $chain;
+            }
         }
-
-        if (count($counts) === 0) {
-            return null;
-        }
-
-        $letter = array_keys($counts, min($counts))[0];
-        $this->optimal = $strings[$letter];
-        return $letter;
+        return $minimal;
     }
 
-    public function activate(): void
+    public function activate(): int
     {
-        $chain = $this->chain;
-        $comparison = null;
-        while ($comparison !== $chain) {
-            $comparison = $chain;
-            $chain = str_split($chain);
-            for ($i = 0; $i < count($chain) - 1; $i++) {
-
-                if (strtoupper($chain[$i]) !== strtoupper($chain[$i + 1]) || $chain[$i] === $chain[$i + 1]) {
-                    continue;
-                }
-
-                unset($chain[$i]);
-                unset($chain[$i + 1]);
-                $chain = array_values($chain);
-            }
-            $chain = implode('', $chain);
-        }
-
-        $this->activated = $chain;
+        $this->activated = self::reduce($this->chain);
+        return strlen($this->activated);
     }
 
     /**
+     * @param string $chain
+     * @param string|null $removeFirst
      * @return string
      */
-    public function getChain(): string
+    public static function reduce(string $chain, ?string $removeFirst = null): string
     {
-        return $this->chain;
-    }
+        if ($removeFirst !== null) {
+            $chain = str_ireplace($removeFirst, '', $chain);
+        }
 
-    /**
-     * @return string|null
-     */
-    public function getActivatedChain(): ?string
-    {
-        return $this->activated;
-    }
+        $chainStack = str_split($chain);
+        $outputStack = [];
 
-    /**
-     * @return string|null
-     */
-    public function getOptimalChain(): ?string
-    {
-        return $this->optimal;
+        foreach ($chainStack as $chainItem) {
+            if ($outputStack === []) {
+                $outputStack[] = $chainItem;
+                continue;
+            }
+            $last = ord(end($outputStack));
+            if (abs($last - ord($chainItem)) === 32) {
+                array_pop($outputStack);
+            } else {
+                array_push($outputStack, $chainItem);
+            }
+        }
+
+        return implode('', $outputStack);
     }
 }
