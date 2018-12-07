@@ -1,29 +1,21 @@
 <?php
 
-
 namespace Cheezykins\AdventOfCode\DayFive;
-
 
 class Polymer
 {
     /** @var string $chain */
     protected $chain;
 
-    /** @var string|null $activated */
-    protected $activated;
-
-    /** @var string|null $optimal */
-    protected $optimal;
-
     public function __construct(string $chain)
     {
         $this->chain = $chain;
     }
 
-    public function optimize(): ?int
+    public function optimize(): int
     {
         $letters = range('a', 'z');
-        $minimal = null;
+        $minimal = strlen($this->chain);
 
         foreach ($letters as $letter) {
             if (stripos($this->chain, $letter) === false) {
@@ -40,8 +32,7 @@ class Polymer
 
     public function activate(): int
     {
-        $this->activated = self::reduce($this->chain);
-        return strlen($this->activated);
+        return strlen(self::reduce($this->chain));
     }
 
     /**
