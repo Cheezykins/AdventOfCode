@@ -35,11 +35,22 @@ class SleighTest extends TestCase
     public function testSleighCanArrangeExecutionOrder()
     {
         $s = new Sleigh();
-
         $s->setInstructions($this->fixtures);
+        $letters = [];
+        while (($instruction = $s->getNextInstruction()) !== null) {
+            $letters[] = $instruction->getName();
+            $instruction->resolve();
+        }
 
+        $this->assertEquals(['C', 'A', 'B', 'D', 'F', 'E'], $letters);
 
+    }
 
-        $s->getExecutionOrder();
+    public function testSleighCanAssignWorkToWorkers()
+    {
+        $s = new Sleigh(2);
+        $s->setInstructions($this->fixtures, 0);
+        $duration = $s->getWorkDuration();
+        $this->assertEquals(15, $duration);
     }
 }

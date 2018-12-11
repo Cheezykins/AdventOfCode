@@ -8,13 +8,27 @@ class Step
 {
     protected $name;
 
-    /** @var array|Step[] $parents */
-    protected $parents = [];
+    /** @var array|Step[] $requirements */
+    protected $requirements = [];
 
     protected $resolved = false;
+    protected $assigned = false;
+
+    protected $duration;
+    protected $remaining;
 
     /** @var Step $next */
     protected $next;
+
+    public function assign(): void
+    {
+        $this->assigned = true;
+    }
+
+    public function isAssigned(): bool
+    {
+        return $this->assigned;
+    }
 
     public function isResolved(): bool
     {
@@ -26,35 +40,36 @@ class Step
         $this->resolved = true;
     }
 
-    public function __construct(string $name)
+    public function __construct(string $name, int $baseDuration = 60)
     {
         $this->name = $name;
+        $this->duration = $baseDuration + (ord($name) - 64);
+        $this->remaining = $this->duration;
     }
 
-    protected function sortParents()
+    public function addRequirement(Step $newParent)
     {
-        usort($this->parents, function (Step $a, Step $b) {
-            return $a->getName() <=> $b->getName();
-        });
+        $this->requirements[] = $newParent;
     }
 
-    public function addParent(Step $newParent)
+    public function getDuration(): int
     {
-        $this->parents[] = $newParent;
-        $this->sortParents();
+        return $this->duration;
     }
 
-    public function getParentCount(): int
+    public function allRequirementsResolved(): bool
     {
-        return count($this->parents);
+        foreach ($this->requirements as $requirement) {
+            if (!$requirement->isResolved()) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    /**
-     * @return array|Step[]
-     */
-    public function getParents(): array
+    public function tick(): int
     {
-        return $this->parents;
+        return --$this->remaining;
     }
 
     /**
@@ -67,20 +82,27 @@ class Step
 
     /**
      * @param string $string
+     * @param int $baseDuration
      * @throws \Exception
      */
-    public static function createOrUpdateFromString(string $string): void
+    public static function createOrUpdateFromString(string $string, int $baseDuration = 60): void
     {
         $matches = [];
         if (preg_match_all('/[sS]tep ([A-Z]{1})/', $string, $matches) == 0) {
             throw new \Exception('Invalid step string: ', $string);
         }
-        [$parent, $child] = $matches[1];
+        [$requirement, $requirer] = $matches[1];
 
-        Sleigh::$instructions[$parent] = Sleigh::$instructions[$parent] ?? new Step($parent);
-        Sleigh::$instructions[$child] = Sleigh::$instructions[$child] ?? new Step($child);
+        Sleigh::$instructions[$requirement] = Sleigh::$instructions[$requirement] ?? new Step($requirement, $baseDuration);
+        Sleigh::$instructions[$requirer] = Sleigh::$instructions[$requirer] ?? new Step($requirer, $baseDuration);
 
-        Sleigh::$instructions[$child]->addParent(Sleigh::$instructions[$parent]);
+        Sleigh::$instructions[$requirer]->addRequirement(Sleigh::$instructions[$requirement]);
+
+    }
+
+    public function __toString()
+    {
+        return $this->name . ': ' . $this->remaining;
     }
 
 
