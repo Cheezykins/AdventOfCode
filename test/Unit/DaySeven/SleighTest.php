@@ -21,6 +21,12 @@ class SleighTest extends TestCase
         'Step F must be finished before step E can begin.',
     ];
 
+    protected function setUp()
+    {
+        parent::setUp();
+        Sleigh::$instructions = [];
+    }
+
     public function testStepCanCreateFromString()
     {
 
